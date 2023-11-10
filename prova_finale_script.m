@@ -1,8 +1,9 @@
 % PROVA FINALE
 mu = 398600;
-
+%% Caratterizzo prima orbita
 ai = 9455; ei = 0.08729; ii = deg2rad(42.423); 
 OM_i = deg2rad(26.358); om_i = deg2rad(22.135); th_i = deg2rad(176.37);
+
 
 af = 13200; ef = 0.386; i_f = 1.484; OM_f = 2.757; om_f = 0.9111; th_f = 0.2903;
 
