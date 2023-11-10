@@ -1,5 +1,6 @@
 % PROVA FINALE
 mu = 398600;
+stepTh= pi/180;
 %% Caratterizzo prima orbita (angoli in radianti)
 ai = 9455; ei = 0.08729; ii = deg2rad(42.423); 
 OM_i = deg2rad(26.358); om_i = deg2rad(22.135); th_i = deg2rad(176.37);
@@ -20,4 +21,23 @@ D_v1 = sqrt(2*mu*(1/rpi-1/(2*at)))-sqrt(2*mu*(1/rpi-1/(2*ai)));
 D_v2 = sqrt(2*mu*(1/raf-1/(2*af)))-sqrt(2*mu*(1/raf-1/(2*at)));
 D_v = abs(D_v1)+abs(D_v2)
 % apo-peri è meno costosa D_v = 0.942 contro D_V = 0.9969: calcolo tempi
-
+D_t1 = timeOfFlight(ai,ei,th_i,pi,mu)+pi*(sqrt(at^3/mu)+sqrt(af^3/mu));
+th1 = th_i:stepTh:pi; tht = pi:stepTh:2*pi; th2 = 0:stepTh:pi;
+%% Cambio piano all'apogeo: D_i > 0; D_OM > 0;
+D_i = i_f-i_i; D_OM = OM_f-OM_i; 
+alpha = acos(cos(i_i)*cos(i_f)+sin(i_i)*sin(i_f)*cos(D_OM));
+% Calcolo u_i
+cos_ui = (cos(alpha)*cos(i_i)-cos(i_f))/(sin(alpha)*sin(i_i));
+sin_ui = sin(i_f)*sin(D_OM)/sin(alpha);
+u_i = atan2(sin_ui,cos_ui);
+% Calcolo u_f
+cos_uf = (cos(i_i)-cos(alpha)*cos(i_f))/(sin(alpha)*sin(i_f));
+sin_uf = sin(i_i)*sin(D_OM)/sin(alpha);
+u_f = atan2(sin_uf,cos_uf);
+% Calcolo parametri orbite
+th_man_1 = u_i-om_i;
+th_man_2 = th_man_1;
+om2 = u_f - th_man_2 + 2*pi;
+% Calcolo costo manovra
+p = af*(1-ef^2);
+D_v = 2*sqrt(mu/p)*cos(1+ef*cos(pi))*sin(alpha/2)
