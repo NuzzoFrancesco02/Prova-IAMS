@@ -19,4 +19,5 @@ at = (raf+rpi)/2;
 D_v1 = sqrt(2*mu*(1/rpi-1/(2*at)))-sqrt(2*mu*(1/rpi-1/(2*ai)));
 D_v2 = sqrt(2*mu*(1/raf-1/(2*af)))-sqrt(2*mu*(1/raf-1/(2*at)));
 D_v = abs(D_v1)+abs(D_v2)
-% apo-peri è meno costosa: calcolo tempi
+% apo-peri è meno costosa D_v = 0.942 contro D_V = 0.9969: calcolo tempi
+
