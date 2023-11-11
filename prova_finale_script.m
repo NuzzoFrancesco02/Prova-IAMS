@@ -42,10 +42,35 @@ om2 = u_f - th_man_2 + 2*pi;
 % Calcolo costo manovra
 p = af*(1-ef^2);
 D_v = 2*sqrt(mu/p)*cos(1+ef*cos(pi))*sin(alpha/2)
-%% PLOT
+%% PLOT transf economico
 r1 = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
 rt1 = kep2car(at,et,i_i,OM_i,om_i,tht,mu);
 r2 = kep2car(af,ef,i_i,OM_i,om_i,th2,mu);
 
 r_tot = [r1 rt1 r2];
+h = plot3(nan,nan,nan,'LineWidth',2,'Marker','o','MarkerSize',10);
+hold on;
+traj = plot3(nan,nan,nan,'LineWidth',2);
 plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--')
+
+Terra3d;
+circular_plane(max(max(abs(r_tot(1:2,:))))*1.5,0);
+
+for i = 1 : length(r1)
+    plot3(r1(1,1:i),r1(2,1:i),r1(3,1:i),'LineWidth',2,'Color',"#D95319");
+    set(h,'XData',r1(1,i),'YData',r1(2,i),'ZData',r1(3,i));
+    drawnow
+    pause(.001)
+end
+for i = 1 : length(rt1)
+    plot3(rt1(1,1:i),rt1(2,1:i),rt1(3,1:i),'LineWidth',2,'Color',"#77AC30");
+    set(h,'XData',rt1(1,i),'YData',rt1(2,i),'ZData',rt1(3,i));
+    drawnow
+    pause(.001)
+end
+for i = 1 : length(r2)
+    plot3(r2(1,1:i),r2(2,1:i),r2(3,1:i),'LineWidth',2,'Color',"#0072BD");
+    set(h,'XData',r2(1,i),'YData',r2(2,i),'ZData',r2(3,i));
+    drawnow
+    pause(.001)
+end
