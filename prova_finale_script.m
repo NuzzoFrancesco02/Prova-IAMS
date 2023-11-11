@@ -14,16 +14,17 @@ rpi = ai*(1-ei); rai = ai*(1+ei); rpf = af*(1-ef); raf = ai*(1+ef);
 at = (rai+rpf)/2; et = (rai-rpf)/(rai+rpf);
 D_v1 = sqrt(2*mu*(1/rai-1/(2*at)))-sqrt(2*mu*(1/rai-1/(2*ai)));
 D_v2 = sqrt(2*mu*(1/rpf-1/(2*af)))-sqrt(2*mu*(1/rpf-1/(2*at)));
-D_v = abs(D_v1)+abs(D_v2)
+D_v_a_p = abs(D_v1)+abs(D_v2)
 % peri-apo
 at = (raf+rpi)/2;
 D_v1 = sqrt(2*mu*(1/rpi-1/(2*at)))-sqrt(2*mu*(1/rpi-1/(2*ai)));
 D_v2 = sqrt(2*mu*(1/raf-1/(2*af)))-sqrt(2*mu*(1/raf-1/(2*at)));
-D_v = abs(D_v1)+abs(D_v2)
+D_v_p_a = abs(D_v1)+abs(D_v2)
 % apo-peri è meno costosa D_v = 0.942 contro D_V = 0.9969: calcolo tempi
 at = (rai+rpf)/2; et = (rai-rpf)/(rai+rpf);
-D_t1 = timeOfFlight(ai,ei,th_i,pi,mu)+pi*(sqrt(at^3/mu)+sqrt(af^3/mu));
+D_t = timeOfFlight(ai,ei,th_i,pi,mu)+pi*(sqrt(at^3/mu)+sqrt(af^3/mu));
 th1 = th_i:stepTh:pi; tht = pi:stepTh:2*pi; 
+D_v = abs(D_v_a_p);
 %% Cambio piano all'apogeo: D_i > 0; D_OM > 0;
 D_i = i_f-i_i; D_OM = OM_f-OM_i; 
 alpha = acos(cos(i_i)*cos(i_f)+sin(i_i)*sin(i_f)*cos(D_OM));
@@ -41,15 +42,20 @@ th_man_2 = th_man_1;
 om2 = u_f - th_man_2 + 2*pi;
 % Calcolo costo manovra
 p = af*(1-ef^2);
-D_v = 2*sqrt(mu/p)*cos(1+ef*cos(pi))*sin(alpha/2)
+D_v = D_v + abs(2*sqrt(mu/p)*cos(1+ef*cos(pi))*sin(alpha/2));
 th2 = 0:stepTh:th_man_1;
+D_t = D_t + timeOfFlight(af,ef,0,th_man_1,mu);
 %% Cambio periasse
 d_om = om_f-om2+2*pi;
 th1_m = pi+d_om/2; 
 th2_m = pi-d_om/2;
-D_v = 2*sqrt(mu/p)*ef*sin(th1_m);
+D_v = D_v + abs(2*sqrt(mu/p)*ef*sin(th1_m));
 th3 = th_man_2:stepTh:th1_m;
+D_t = D_t + timeOfFlight(af,ef,th_man_2,th1_m,mu);
 th4 = th2_m:stepTh:th_f+2*pi;
+D_t = D_t + timeOfFlight(af,ef,th2_m,th_f,mu);
+D_t
+D_v
 %% PLOT transf economico
 r1 = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
 rt1 = kep2car(at,et,i_i,OM_i,om_i,tht,mu);
