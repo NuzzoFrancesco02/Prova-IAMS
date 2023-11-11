@@ -49,10 +49,10 @@ th2 = pi:stepTh:th_man_1;
 D_t = D_t + timeOfFlight(af,ef,0,th_man_1,mu);
 %% Cambio periasse
 d_om = om_f-om2+2*pi;
-th1_m = pi+d_om/2; 
-th2_m = pi-d_om/2;
+th1_m = d_om/2; 
+th2_m = 2*pi-d_om/2;
 D_v = D_v + abs(2*sqrt(mu/p)*ef*sin(th1_m));
-th3 = th_man_2:stepTh:th1_m;
+th3 = th_man_2:stepTh:th1_m+2*pi;
 D_t = D_t + timeOfFlight(af,ef,th_man_2,th1_m,mu);
 th4 = th2_m:stepTh:th_f+2*pi;
 D_t = D_t + timeOfFlight(af,ef,th2_m,th_f,mu);

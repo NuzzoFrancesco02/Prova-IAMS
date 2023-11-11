@@ -25,7 +25,7 @@ at = (raf+rpi)/2; et = (raf-rpi)/(raf+rpi);
 D_t = timeOfFlight(ai,ei,th_i,pi,mu)+pi*(sqrt(at^3/mu));
 th1 = th_i:stepTh:2*pi; tht = 0:stepTh:pi; 
 D_v = abs(D_v_a_p);
-%% Cambio piano all'apogeo: D_i > 0; D_OM > 0;
+%% Cambio all'apogeo: D_i > 0; D_OM > 0;
 D_i = i_f-i_i; D_OM = OM_f-OM_i; 
 alpha = acos(cos(i_i)*cos(i_f)+sin(i_i)*sin(i_f)*cos(D_OM));
 % Calcolo u_i
