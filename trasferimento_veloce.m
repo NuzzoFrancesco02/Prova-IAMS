@@ -28,14 +28,18 @@ om2 = u_f - th_man_2 + 2*pi;
 th_man_1 = th_man_1 + pi;
 th_man_2 = th_man_2 + pi;
 % Calcolo costo manovra
-p = af*(1-ef^2);
-D_v = abs(2*sqrt(mu/p)*(1+ef*cos(pi))*sin(alpha/2));
+p = ai*(1-ei^2);
+D_v = abs(2*sqrt(mu/p)*(1+ei*cos(th_man_1))*sin(alpha/2));
 th1 = th_i:stepTh:th_man_1;
 D_t =  timeOfFlight(ai,ei,th_i,th_man_1,mu);
 %% Cambio secante
 p_i = ai*(1-ei^2); p_f = af*(1-ef^2); d_om = om_f-om2;
 fun = @(th) p_i*(1+ef*cos(th-d_om))-p_f*(1+ei*cos(th));
 th_1 = fsolve(fun, 0); th_2 = th_1-d_om;
+v_r1 = sqrt(mu/p_i)*ei*sin(th_1); v_th1 = sqrt(mu/p_i)*(1+ei*cos(th_1));
+v_r2 = sqrt(mu/p_f)*ef*sin(th_2); v_th2 = sqrt(mu/p_f)*(1+ef*cos(th_2));
+D_v_r = v_r2-v_r1; D_v_th = v_th2-v_th1;
+D_v = sqrt(D_v_r^2+D_v_th^2) + D_v
 th2 = th_man_2:stepTh:th_1+2*pi;
 D_t = D_t + timeOfFlight(ai,ei,th_man_2,th_1,mu);
 th3 = th_2:stepTh:th_f+2*pi;
@@ -44,10 +48,8 @@ D_t = D_t + timeOfFlight(af,ef,th_2,th_f,mu)
 
 %% PLOT transf veloce
 r1 = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
-%rt1 = kep2car(at,et,i_i,OM_i,om_i,tht,mu);
 r2 = kep2car(ai,ei,i_f,OM_f,om2,th2,mu);
 r3 = kep2car(af,ef,i_f,OM_f,om_f,th3,mu);
-%r4 = kep2car(af,ef,i_f,OM_f,om_f,th4,mu);
 r_tot = [r1 r2 r3];
 h = plot3(nan,nan,nan,'LineWidth',2,'Marker','o','MarkerSize',10,'Color','black','MarkerFaceColor','black');
 hold on;
@@ -64,12 +66,6 @@ for i = 1 : size(r1,2)
     drawnow
     pause(.0001)
 end
-% for i = 1 : size(rt1,2)
-%     plot3(rt1(1,1:i),rt1(2,1:i),rt1(3,1:i),'LineWidth',2,'Color',"#77AC30");
-%     set(h,'XData',rt1(1,i),'YData',rt1(2,i),'ZData',rt1(3,i));
-%     drawnow
-%     pause(.0001)
-% end
 for i = 1 : size(r2,2)
     plot3(r2(1,1:i),r2(2,1:i),r2(3,1:i),'LineWidth',2,'Color',"#0072BD");
     set(h,'XData',r2(1,i),'YData',r2(2,i),'ZData',r2(3,i));
@@ -82,9 +78,3 @@ for i = 1 : size(r3,2)
     drawnow
     pause(.0001)
 end
-% for i = 1 : size(r4,2)
-%     plot3(r4(1,1:i),r4(2,1:i),r4(3,1:i),'LineWidth',2,'Color',"#0072BD");
-%     set(h,'XData',r4(1,i),'YData',r4(2,i),'ZData',r4(3,i));
-%     drawnow
-%     pause(.0001)
-% end
