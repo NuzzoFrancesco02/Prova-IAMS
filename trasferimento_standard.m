@@ -1,30 +1,12 @@
-% PROVA FINALE
+%% Standard
 mu = 398600;
 stepTh= pi/90;
 %% Caratterizzo prima orbita (angoli in radianti)
-ai = 9455; ei = 0.08729; i_i = deg2rad(42.423); 
-OM_i = deg2rad(26.358); om_i = deg2rad(22.135); th_i = deg2rad(176.37);
-
+r = [-7663.5213 -6485.4986 -2201.1930]'; v = [3.515 -2.916 -3.814]';
+[ai, ei, i_i, OM_i, om_i, th_i] = car2kep(r, v, mu);
 %% Caratterizzo seconda orbita (angoli in radianti)
-af = 13200; ef = 0.386; i_f = 1.484; OM_f = 2.757; om_f = 0.9111; th_f = 0.2903;
-
-% Economica
-% apo-peri
-rpi = ai*(1-ei); rai = ai*(1+ei); rpf = af*(1-ef); raf = ai*(1+ef); 
-at = (rai+rpf)/2; et = (rai-rpf)/(rai+rpf);
-D_v1 = sqrt(2*mu*(1/rai-1/(2*at)))-sqrt(2*mu*(1/rai-1/(2*ai)));
-D_v2 = sqrt(2*mu*(1/rpf-1/(2*af)))-sqrt(2*mu*(1/rpf-1/(2*at)));
-D_v = abs(D_v1)+abs(D_v2)
-% peri-apo
-at = (raf+rpi)/2;
-D_v1 = sqrt(2*mu*(1/rpi-1/(2*at)))-sqrt(2*mu*(1/rpi-1/(2*ai)));
-D_v2 = sqrt(2*mu*(1/raf-1/(2*af)))-sqrt(2*mu*(1/raf-1/(2*at)));
-D_v = abs(D_v1)+abs(D_v2)
-% apo-peri è meno costosa D_v = 0.942 contro D_V = 0.9969: calcolo tempi
-at = (rai+rpf)/2; et = (rai-rpf)/(rai+rpf);
-D_t1 = timeOfFlight(ai,ei,th_i,pi,mu)+pi*(sqrt(at^3/mu)+sqrt(af^3/mu));
-th1 = th_i:stepTh:pi; tht = pi:stepTh:2*pi; 
-%% Cambio piano all'apogeo: D_i > 0; D_OM > 0;
+af = 13200; ef = 0.3860; i_f = 1.4840; OM_f = 2.7570; om_f = 0.9111; th_f = 0.2903;
+%% Cambio di piano: D_i > 0; D_OM > 0;
 D_i = i_f-i_i; D_OM = OM_f-OM_i; 
 alpha = acos(cos(i_i)*cos(i_f)+sin(i_i)*sin(i_f)*cos(D_OM));
 % Calcolo u_i
@@ -39,27 +21,43 @@ u_f = atan2(sin_uf,cos_uf);
 th_man_1 = u_i-om_i;
 th_man_2 = th_man_1;
 om2 = u_f - th_man_2 + 2*pi;
+th_man_1 = th_man_1 + pi; th_man_2 = th_man_1;
 % Calcolo costo manovra
-p = af*(1-ef^2);
-D_v = 2*sqrt(mu/p)*cos(1+ef*cos(pi))*sin(alpha/2)
-th2 = 0:stepTh:th_man_1;
+p = ai*(1-ei^2);
+D_v = abs(2*sqrt(mu/p)*(1+ei*cos(th_man_1))*sin(alpha/2));
+th1 = th_i:stepTh:th_man_1;
+D_t = timeOfFlight(ai,ei,th_i,th_man_1,mu);
 %% Cambio periasse
 d_om = om_f-om2+2*pi;
-th1_m = pi+d_om/2; 
-th2_m = pi-d_om/2;
-D_v = 2*sqrt(mu/p)*ef*sin(th1_m);
-th3 = th_man_2:stepTh:th1_m;
-th4 = th2_m:stepTh:th_f+2*pi;
-%% PLOT transf economico
-r1 = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
-rt1 = kep2car(at,et,i_i,OM_i,om_i,tht,mu);
-r2 = kep2car(af,ef,i_i,OM_i,om_i,th2,mu);
-r3 = kep2car(af,ef,i_f,OM_f,om2,th3,mu);
-r4 = kep2car(af,ef,i_f,OM_f,om_f,th4,mu);
-r_tot = [r1 rt1 r2 r3 r4];
+th1_m = d_om/2; 
+th2_m = 2*pi-d_om/2;
+D_v = D_v + abs(2*sqrt(mu/p)*ei*sin(th1_m));
+th2 = th_man_2:stepTh:th1_m+2*pi;
+D_t = D_t + timeOfFlight(ai,ei,th_man_2,th1_m,mu);
+th3 = th2_m:stepTh:2*pi;
+D_t = D_t + timeOfFlight(ai,ei,th2_m,2*pi,mu);
+%% Cambio forma
+rpi = ai*(1-ei); rai = ai*(1+ei); rpf = af*(1-ef); raf = af*(1+ef); 
+at = (raf+rpi)/2; et = (raf-rpi)/(raf+rpi);
+D_t = D_t + pi*(sqrt(at^3/mu));
+tht = 0:stepTh:pi; 
+th4 = pi:stepTh:th_f+2*pi;
+D_v1 = sqrt(2*mu*(1/rpi-1/(2*at)))-sqrt(2*mu*(1/rpi-1/(2*ai)));
+D_v2 = sqrt(2*mu*(1/raf-1/(2*af)))-sqrt(2*mu*(1/raf-1/(2*at)));
+D_v_p_a = abs(D_v1)+abs(D_v2);
+D_v = D_v + abs(D_v_p_a)
+D_t = D_t + timeOfFlight(af,ef,pi,th_f,mu)
+
+r1 = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu); % arrivo al cambio piano
+r2 = kep2car(ai,ei,i_f,OM_f,om2,th2,mu); % arrivo al cambio di periasse
+r3 = kep2car(ai,ei,i_f,OM_f,om_f,th3,mu); % arrivo al pericentro
+rt1 = kep2car(at,et,i_f,OM_f,om_f,tht,mu); % trasferimento
+r4 = kep2car(af,ef,i_f,OM_f,om_f,th4,mu); % arrivo punto finale
+
+r_tot = [r1 r2 r3 rt1 r4];
 h = plot3(nan,nan,nan,'LineWidth',2,'Marker','o','MarkerSize',10,'Color','black','MarkerFaceColor','black');
 hold on;
-gi
+grid on;
 traj = plot3(nan,nan,nan,'LineWidth',2);
 plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--')
 
@@ -72,12 +70,6 @@ for i = 1 : size(r1,2)
     drawnow
     pause(.0001)
 end
-for i = 1 : size(rt1,2)
-    plot3(rt1(1,1:i),rt1(2,1:i),rt1(3,1:i),'LineWidth',2,'Color',"#77AC30");
-    set(h,'XData',rt1(1,i),'YData',rt1(2,i),'ZData',rt1(3,i));
-    drawnow
-    pause(.0001)
-end
 for i = 1 : size(r2,2)
     plot3(r2(1,1:i),r2(2,1:i),r2(3,1:i),'LineWidth',2,'Color',"#0072BD");
     set(h,'XData',r2(1,i),'YData',r2(2,i),'ZData',r2(3,i));
@@ -87,6 +79,12 @@ end
 for i = 1 : size(r3,2)
     plot3(r3(1,1:i),r3(2,1:i),r3(3,1:i),'LineWidth',2,'Color',"#D95319");
     set(h,'XData',r3(1,i),'YData',r3(2,i),'ZData',r3(3,i));
+    drawnow
+    pause(.0001)
+end
+for i = 1 : size(rt1,2)
+    plot3(rt1(1,1:i),rt1(2,1:i),rt1(3,1:i),'LineWidth',2,'Color',"#77AC30");
+    set(h,'XData',rt1(1,i),'YData',rt1(2,i),'ZData',rt1(3,i));
     drawnow
     pause(.0001)
 end

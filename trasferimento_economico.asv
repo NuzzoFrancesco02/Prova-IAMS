@@ -22,10 +22,10 @@ D_v2 = sqrt(2*mu*(1/raf-1/(2*af)))-sqrt(2*mu*(1/raf-1/(2*at)));
 D_v_p_a = abs(D_v1)+abs(D_v2)
 % peri-apo è meno costosa D_v = 0.942 contro D_V = 0.9157: calcolo tempi
 at = (raf+rpi)/2; et = (raf-rpi)/(raf+rpi);
-D_t = timeOfFlight(ai,ei,th_i,pi,mu)+pi*(sqrt(at^3/mu)+sqrt(af^3/mu));
+D_t = timeOfFlight(ai,ei,th_i,pi,mu)+pi*(sqrt(at^3/mu));
 th1 = th_i:stepTh:2*pi; tht = 0:stepTh:pi; 
 D_v = abs(D_v_a_p);
-%% Cambio piano all'apogeo: D_i > 0; D_OM > 0;
+%% Cambio all'apogeo: D_i > 0; D_OM > 0;
 D_i = i_f-i_i; D_OM = OM_f-OM_i; 
 alpha = acos(cos(i_i)*cos(i_f)+sin(i_i)*sin(i_f)*cos(D_OM));
 % Calcolo u_i
@@ -37,13 +37,13 @@ cos_uf = (cos(i_i)-cos(alpha)*cos(i_f))/(sin(alpha)*sin(i_f));
 sin_uf = sin(i_i)*sin(D_OM)/sin(alpha);
 u_f = atan2(sin_uf,cos_uf);
 % Calcolo parametri orbite
-th_man_1 = u_i-om_i;
+th_man_1 = u_i-om_i+pi;
 th_man_2 = th_man_1;
 om2 = u_f - th_man_2 + 2*pi;
 % Calcolo costo manovra
 p = af*(1-ef^2);
 D_v = D_v + abs(2*sqrt(mu/p)*cos(1+ef*cos(pi))*sin(alpha/2));
-th2 = pi:stepTh:th_man_1+pi;
+th2 = pi:stepTh:th_man_1;
 D_t = D_t + timeOfFlight(af,ef,pi,th_man_1,mu);
 %% Cambio periasse
 d_om = om_f-om2+2*pi;
