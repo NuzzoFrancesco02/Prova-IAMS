@@ -42,7 +42,7 @@ th_man_2 = th_man_1;
 om2 = u_f - th_man_2 + 2*pi;
 % Calcolo costo manovra
 p = af*(1-ef^2);
-D_v = D_v + abs(2*sqrt(mu/p)*(1+ef*cos(pi))*sin(alpha/2));
+D_v = D_v + abs(2*sqrt(mu/p)*(1+ef*cos(th_man_1+pi))*sin(alpha/2));
 th2 = pi:stepTh:th_man_1+pi;
 D_t = D_t + timeOfFlight(af,ef,pi,th_man_1+pi,mu);
 %% Cambio periasse

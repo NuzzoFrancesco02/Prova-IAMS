@@ -42,15 +42,23 @@ th_man_2 = th_man_1;
 om2 = u_f - th_man_2 + 2*pi;
 % Calcolo costo manovra
 p = af*(1-ef^2);
-D_v = D_v + abs(2*sqrt(mu/p)*(1+ef*cos(th_man_1+pi))*sin(alpha/2));
-th2 = pi:stepTh:th_man_1+pi;
+D_v = D_v + abs(2*sqrt(mu/p)*(1+ef*cos(th_man_1))*sin(alpha/2));
+th2 = pi:stepTh:th_man_1+2*pi;
 D_t = D_t + timeOfFlight(af,ef,pi,th_man_1+pi,mu);
+%% Bitangente
+tht1 = 0:stepTh:pi;
+tht2 = pi:stepTh:2*pi;
+r_bit = 3e4; r_man = kep2car(af,ef,i_i,OM_i,om_i,th_man_1,mu);
+r_man = norm(r_man); OM_bit = OM_i; om_bit = om_i+th_man_1;
+a_bit = (r_man+r_bit)/2; e_bit = (r_bit-r_man)/(r_bit+r_man);
+
+
 %% Cambio periasse
 d_om = om_f-om2+2*pi;
 th1_m = d_om/2; 
 th2_m = 2*pi-d_om/2;
 D_v = D_v + abs(2*sqrt(mu/p)*ef*sin(th1_m));
-th3 = th_man_2+pi:stepTh:th1_m+2*pi;
+th3 = th_man_2:stepTh:th1_m+2*pi;
 D_t = D_t + timeOfFlight(af,ef,th_man_2+pi,th1_m,mu);
 th4 = th2_m:stepTh:th_f+2*pi;
 D_t = D_t + timeOfFlight(af,ef,th2_m,th_f,mu);
@@ -60,17 +68,19 @@ D_v
 r1 = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
 rt1 = kep2car(at,et,i_i,OM_i,om_i,tht,mu);
 r2 = kep2car(af,ef,i_i,OM_i,om_i,th2,mu);
+rbi1 = kep2car(a_bit,e_bit,i_i,OM_i,u_i,tht1,mu);
+rbi2 = kep2car(a_bit,e_bit,i_f,OM_f,u_f,tht2,mu);
 r3 = kep2car(af,ef,i_f,OM_f,om2,th3,mu);
 r4 = kep2car(af,ef,i_f,OM_f,om_f,th4,mu);
-r_tot = [r1 rt1 r2 r3 r4];
+r_tot = [r1 rt1 r2 rbi1 rbi2 r3 r4];
 h = plot3(nan,nan,nan,'LineWidth',2,'Marker','o','MarkerSize',10,'Color','black','MarkerFaceColor','black');
 hold on;
 grid on;
 traj = plot3(nan,nan,nan,'LineWidth',2);
-plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--')
+%plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--')
 
 Terra3d;
-circular_plane(max(max(abs(r_tot(1:2,:))))*1.5,0);
+%circular_plane(max(max(abs(r_tot(1:2,:))))*1.5,0);
 
 for i = 1 : size(r1,2)
     plot3(r1(1,1:i),r1(2,1:i),r1(3,1:i),'LineWidth',2,'Color',"#D95319");
@@ -87,6 +97,18 @@ end
 for i = 1 : size(r2,2)
     plot3(r2(1,1:i),r2(2,1:i),r2(3,1:i),'LineWidth',2,'Color',"#0072BD");
     set(h,'XData',r2(1,i),'YData',r2(2,i),'ZData',r2(3,i));
+    drawnow
+    pause(.0001)
+end
+for i = 1 : size(rbi1,2)
+    plot3(rbi1(1,1:i),rbi1(2,1:i),rbi1(3,1:i),'LineWidth',2,'Color',"#0072BD");
+    set(h,'XData',rbi1(1,i),'YData',rbi1(2,i),'ZData',rbi1(3,i));
+    drawnow
+    pause(.0001)
+end
+for i = 1 : size(rbi2,2)
+    plot3(rbi2(1,1:i),rbi2(2,1:i),rbi2(3,1:i),'LineWidth',2,'Color',"#0072BD");
+    set(h,'XData',rbi2(1,i),'YData',rbi2(2,i),'ZData',rbi2(3,i));
     drawnow
     pause(.0001)
 end
