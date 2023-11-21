@@ -22,9 +22,9 @@ D_v2 = sqrt(2*mu*(1/raf-1/(2*af)))-sqrt(2*mu*(1/raf-1/(2*at)));
 D_v_p_a = abs(D_v1)+abs(D_v2)
 % peri-apo è meno costosa D_v = 0.942 contro D_V = 0.9157: calcolo tempi
 at = (raf+rpi)/2; et = (raf-rpi)/(raf+rpi);
-D_t = timeOfFlight(ai,ei,th_i,pi,mu)+pi*(sqrt(at^3/mu));
+D_t = timeOfFlight(ai,ei,th_i,2*pi,mu)+pi*(sqrt(at^3/mu));
 th1 = th_i:stepTh:2*pi; tht = 0:stepTh:pi; 
-D_v = abs(D_v_a_p);
+D_v = abs(D_v_p_a);
 %% Cambio all'apogeo: D_i > 0; D_OM > 0;
 D_i = i_f-i_i; D_OM = OM_f-OM_i; 
 alpha = acos(cos(i_i)*cos(i_f)+sin(i_i)*sin(i_f)*cos(D_OM));
