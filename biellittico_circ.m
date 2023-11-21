@@ -1,6 +1,6 @@
 % BIELLITTICO
 mu = 398600;
-stepTh= pi/90;
+stepTh= pi/10;
 %% Caratterizzo prima orbita (angoli in radianti)
 r = [-7663.5213 -6485.4986 -2201.1930]'; v = [3.515 -2.916 -3.814]';
 [ai, ei, i_i, OM_i, om_i, th_i] = car2kep(r, v, mu);
@@ -65,11 +65,13 @@ r3 = kep2car(ai,ei,i_f,OM_f,om2,th3,mu); % arrivo a cambio secondo periasse
 r4 = kep2car(ai,ei,i_f,OM_f,om_f,th4,mu); % arrivo a perigeo
 rt3 = kep2car(at,et,i_f,OM_f,om_f,tht3,mu); % bitangente 3
 r5 = kep2car(af,ef,i_f,OM_f,om_f,th5,mu); % arrivo th finale
+r_tot = [r1 r2 rt1 rt2 r3 r4 rt3 r5];
 
-h = plot3(nan,nan,nan,'LineWidth',2,'Marker','o','MarkerSize',10,'Color','black','MarkerFaceColor','black');
+h = plot3(nan,nan,nan,'LineWidth',2,'Marker','o','MarkerSize',5,'Color','black','MarkerFaceColor','black');
 hold on;
 grid on;
 traj = plot3(nan,nan,nan,'LineWidth',2);
+plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--')
 for i = 1 : size(r1,2)
     plot3(r1(1,1:i),r1(2,1:i),r1(3,1:i),'LineWidth',2,'Color',"#D95319");
     set(h,'XData',r1(1,i),'YData',r1(2,i),'ZData',r1(3,i));
@@ -118,6 +120,4 @@ for i = 1 : size(r3,2)
     drawnow
     pause(.0001)
 end
-
-
 grid on;
