@@ -15,7 +15,8 @@
 % "circular_plane.m", "8k_earth_daymap-2.jpg", "Earth3d". You can download
 % them from the terminal by using these lines:
 %
-% cd \
+% >> cd "path of your folder"\
+% >> 
 function plot_orbit(r,v,col,leg)
     n = length(fieldnames(r)); r_tot = [];
     if ~isstruct(r)
