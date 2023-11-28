@@ -82,7 +82,7 @@ r_bit = (1:100).*1e5;
 abit1 = (r_bit+rpi)/2; ebit1 = (r_bit-rpi)./(r_bit+rpi);
 abit2 = (r_bit+rpf)/2; ebit2 = (r_bit-rpf)./(r_bit+rpf);
 p1 = abit1.*(1-ebit1.^2); p2 = abit2.*(1-ebit2.^2);
-D_v_plane = abs(2*sqrt(mu./p).*(1+ebit1.*cos(pi)).*sin(alpha/2));
+D_v_plane = abs(2*sqrt(mu./p1).*(1+ebit1.*cos(pi)).*sin(alpha/2));
 D_v = D_v + D_v_plane; %D_v cambio piano
 D_v = D_v + abs(sqrt(2*mu*(1./rpi-1./(2*abit1)))-sqrt(2*mu*(1./rpi-1./(2*ai)))); %D_v primo ramo biellittico
 D_v = D_v + abs(sqrt(2*mu*(1./r_bit-1./(2*abit2)))-sqrt(2*mu*(1./r_bit-1./(2*abit1)))); %D_v secondo ramo biellittico
