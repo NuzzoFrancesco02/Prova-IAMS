@@ -1,6 +1,6 @@
 % PROVA FINALE
 mu = 398600;
-stepTh= pi/20;
+stepTh= pi/100;
 %% Caratterizzo prima orbita (angoli in radianti)
 r = [-7663.5213 -6485.4986 -2201.1930]'; v = [3.515 -2.916 -3.814]';
 [ai, ei, i_i, OM_i, om_i, th_i] = car2kep(r, v, mu);
@@ -23,7 +23,7 @@ D_v_p_a = abs(D_v1)+abs(D_v2)
 % peri-apo è meno costosa D_v = 0.942 contro D_V = 0.9157: calcolo tempi
 at = (raf+rpi)/2; et = (raf-rpi)/(raf+rpi);
 D_t = timeOfFlight(ai,ei,th_i,2*pi,mu)+pi*(sqrt(at^3/mu));
-th1 = th_i:stepTh:2*pi; tht = 0:stepTh:pi; 
+th1 = th_i:stepTh:2*pi; tht = th1(end)-2*pi:stepTh:pi; 
 D_v = abs(D_v_p_a);
 %% Cambio all'apogeo: D_i > 0; D_OM > 0;
 D_i = i_f-i_i; D_OM = OM_f-OM_i; 
@@ -60,10 +60,11 @@ D_v
 [r1,v1] = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
 [rt1,v2] = kep2car(at,et,i_i,OM_i,om_i,tht,mu);
 [r2,v3] = kep2car(af,ef,i_i,OM_i,om_i,th2,mu);
-[r3,v4] = kep2car(af,ef,i_f,OM_f,om2,th3,mu);
+[r3,v4] = kep2car(af,ef,i_f,OM_f,om2,th3,mu);   
 [r4,v5] = kep2car(af,ef,i_f,OM_f,om_f,th4,mu);
 r_tot = struct('r1',r1,'r2',rt1,'r3',r2,'r4',r3,'r5',r4);
 v_tot = struct('v1',v1,'v2',v2,'v3',v3,'v4',v4,'v5',v5);
-col = ["#D95319","#77AC30","#0072BD","#D95319","#0072BD"];
-leg = ["trasf 1","trasf 2","trasf 3","trasf 4","trasf 5"];
-plot_orbit(r_tot,col,leg,v_tot)
+col = ["#0072BD","#77AC30","#D95319","#4DBEEE","#A2142F"];
+leg = ["Approach to apocenter","Trasf. bitangente","Attesa cambio piano","Attesa cambio periasse","Arrivo punto finale"];
+view_vec = [260,-5];
+plot_orbit(r_tot,v_tot,col,leg,view_vec,'exp');

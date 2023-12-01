@@ -1,6 +1,6 @@
 % PROVA FINALE economico con manovra cambio piano diversa
 mu = 398600;
-stepTh= pi/90;
+stepTh= pi/180;
 %% Caratterizzo prima orbita (angoli in radianti)
 r = [-7663.5213 -6485.4986 -2201.1930]'; v = [3.515 -2.916 -3.814]';
 [ai, ei, i_i, OM_i, om_i, th_i] = car2kep(r, v, mu);
@@ -57,14 +57,15 @@ D_t = D_t + timeOfFlight(af,ef,th2_m,th_f,mu);
 D_t
 D_v
 %% PLOT transf economico
-r1 = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
-rt1 = kep2car(at,et,i_i,OM_i,om_i,tht,mu);
-r2 = kep2car(af,ef,i_i,OM_i,om_i,th2,mu);
-r3 = kep2car(af,ef,i_f,OM_f,om2,th3,mu);
-r4 = kep2car(af,ef,i_f,OM_f,om_f,th4,mu);
+[r1,v1] = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
+[rt1,v2] = kep2car(at,et,i_i,OM_i,om_i,tht,mu);
+[r2,v3] = kep2car(af,ef,i_i,OM_i,om_i,th2,mu);
+[r3,v4] = kep2car(af,ef,i_f,OM_f,om2,th3,mu);
+[r4,v5] = kep2car(af,ef,i_f,OM_f,om_f,th4,mu);
 r_tot = struct('r1',r1,'r2',rt1,'r3',r2,'r4',r3,'r5',r4);
 v_tot = struct('v1',v1,'v2',v2,'v3',v3,'v4',v4,'v5',v5);
 col = ["#D95319","#77AC30","#0072BD","#D95319","#0072BD"];
-leg = ["trasf 1","trasf 2","trasf 3","trasf 4","trasf 5"];
-plot_orbit(r_tot,col,leg,v_tot)
+leg = ["Approach to pericenter","Bitangent transfer","Waiting change of plane","Waiting change of periapsis","Approach final point"];
+view_vec = [10,30];
+plot_orbit(r_tot,v_tot,col,leg,view_vec);
 

@@ -1,6 +1,6 @@
 % BIELLITTICO
 mu = 398600;
-stepTh= pi/90;
+stepTh= pi/180;
 %% Caratterizzo prima orbita (angoli in radianti)
 r = [-7663.5213 -6485.4986 -2201.1930]'; v = [3.515 -2.916 -3.814]';
 [ai, ei, i_i, OM_i, om_i, th_i] = car2kep(r, v, mu);
@@ -32,13 +32,13 @@ th_man_1 = u_i-om_cp;
 th_man_2 = th_man_1;
 om2 = u_f - th_man_2 + 2*pi;
 %% bitangente
-r_bit = 1e5;
+r_bit = 2e4;
 abit1 = (r_bit+rpi)/2; ebit1 = (r_bit-rpi)./(r_bit+rpi);
 abit2 = (r_bit+rpf)/2; ebit2 = (r_bit-rpf)./(r_bit+rpf);
 p1 = abit1.*(1-ebit1.^2); p2 = abit2.*(1-ebit2.^2);
 D_v_plane = abs(2*sqrt(mu./p).*(1+ebit1.*cos(pi)).*sin(alpha/2));
 D_v = D_v + D_v_plane; %D_v cambio piano
-tht1 = 0:stepTh:pi; 
+tht1 = th2(end)-2*pi:stepTh:pi; 
 tht2 = pi:stepTh:2*pi;
 D_t = D_t + timeOfFlight(abit1,ebit1,0,pi,mu);
 D_t = D_t + timeOfFlight(abit2,ebit2,pi,2*pi,mu);
@@ -57,55 +57,16 @@ D_t = D_t + timeOfFlight(af,ef,th_peri_2,th_f,mu);
 
 %%
 th_plot = 0:0.01:2*pi; th_bit_1 = 0:stepTh:2*pi; th_bit_2 = 0:stepTh:2*pi;
-Terra3d; circular_plane(4e4,0);
-r1 = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu); % arrivo a cambio primo periasse
-r2 = kep2car(ai,ei,i_i,OM_i,om_cp,th2,mu); % arrivo a perigeo
-rt1 = kep2car(abit1,ebit1,i_i,OM_i,om_cp,tht1,mu); % biellittico 1
-rt2 = kep2car(abit2,ebit2,i_f,OM_f,om2,tht2,mu); % biellittico 2
-r3 = kep2car(af,ef,i_f,OM_f,om2,th3,mu); % arrivo a cambio secondo periasse
-r4 = kep2car(af,ef,i_f,OM_f,om_f,th4,mu); % arrivo a punto finale
+[r1,v1] = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu); % arrivo a cambio primo periasse
+[r2,v2] = kep2car(ai,ei,i_i,OM_i,om_cp,th2,mu); % arrivo a perigeo
+[r3,v3] = kep2car(abit1,ebit1,i_i,OM_i,om_cp,tht1,mu); % biellittico 1
+[r4,v4] = kep2car(abit2,ebit2,i_f,OM_f,om2,tht2,mu); % biellittico 2
+[r5,v5] = kep2car(af,ef,i_f,OM_f,om2,th3,mu); % arrivo a cambio secondo periasse
+[r6,v6] = kep2car(af,ef,i_f,OM_f,om_f,th4,mu); % arrivo a punto finale
 
-r_tot = [r1 r2 rt1 rt2 r3 r4];
-
-h = plot3(nan,nan,nan,'LineWidth',2,'Marker','o','MarkerSize',5,'Color','black','MarkerFaceColor','black');
-hold on;
-grid on;
-traj = plot3(nan,nan,nan,'LineWidth',2);
-plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--')
-for i = 1 : size(r1,2)
-    plot3(r1(1,1:i),r1(2,1:i),r1(3,1:i),'LineWidth',2,'Color',"#D95319");
-    set(h,'XData',r1(1,i),'YData',r1(2,i),'ZData',r1(3,i));
-    drawnow
-    pause(.000001)
-end
-for i = 1 : size(r2,2)
-    plot3(r2(1,1:i),r2(2,1:i),r2(3,1:i),'LineWidth',2,'Color',"#0072BD");
-    set(h,'XData',r2(1,i),'YData',r2(2,i),'ZData',r2(3,i));
-    drawnow
-    pause(.000001)
-end
-for i = 1 : size(rt1,2)
-    plot3(rt1(1,1:i),rt1(2,1:i),rt1(3,1:i),'LineWidth',2,'Color',"#77AC30");
-    set(h,'XData',rt1(1,i),'YData',rt1(2,i),'ZData',rt1(3,i));
-    drawnow
-    pause(.000001)
-end
-for i = 1 : size(rt2,2)
-    plot3(rt2(1,1:i),rt2(2,1:i),rt2(3,1:i),'LineWidth',2,'Color',"#77AC30");
-    set(h,'XData',rt2(1,i),'YData',rt2(2,i),'ZData',rt2(3,i));
-    drawnow
-    pause(.000001)
-end
-for i = 1 : size(r3,2)
-    plot3(r3(1,1:i),r3(2,1:i),r3(3,1:i),'LineWidth',2,'Color',"#D95319");
-    set(h,'XData',r3(1,i),'YData',r3(2,i),'ZData',r3(3,i));
-    drawnow
-    pause(.000001)
-end
-for i = 1 : size(r4,2)
-    plot3(r4(1,1:i),r4(2,1:i),r4(3,1:i),'LineWidth',2,'Color',"#0072BD");
-    set(h,'XData',r4(1,i),'YData',r4(2,i),'ZData',r4(3,i));
-    drawnow
-    pause(.000001)
-end
-grid on;
+r_tot = struct('r1',r1,'r2',r2,'r3',r3,'r4',r4,'r5',r5,'r6',r6);
+v_tot = struct('v1',v1,'v2',v2,'v3',v3,'v4',v4,'v5',v5,'v6',v6);
+col = ["#0072BD","#77AC30","#D95319","#4DBEEE","#A2142F","#EDB120"];
+leg = ["Waiting change of periapsis 1","Approach to pericenter","First bielliptic","Second bielliptic","Waiting change of periapsis 2","Approach final point"];
+view_vec = [-53.6563,13.486];
+plot_orbit(r_tot,v_tot,col,leg,view_vec,'exp');

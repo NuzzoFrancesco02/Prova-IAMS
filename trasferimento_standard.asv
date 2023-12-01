@@ -57,8 +57,8 @@ D_t = D_t + timeOfFlight(af,ef,pi,th_f,mu)
 r_tot = struct('r1',r1,'r2',r2,'r3',r3,'r4',r4,'r5',r5);
 v_tot = struct('v1',v1,'v2',v2,'v3',v3,'v4',v4,'v5',v5);
 col = ["#0072BD","#77AC30","#D95319","#4DBEEE","#A2142F"];
-leg = ["Waiting change of plane","Waiting change of periaspis","Approach to pericenter ","Transfer orbit","Approach final point"];
+leg = ["Attesa cambio piano","Attesa cambio periasse","Arrivo al pericentro","Trasf. bitangente","Arrivo punto finale"];
 view_vec = [280,-5];
-plot_orbit(r_tot,v_tot,col,leg,view_vec);
+plot_orbit(r_tot,v_tot,col,leg,view_vec,'exp');
 
 

@@ -47,34 +47,13 @@ D_t = D_t + timeOfFlight(af,ef,th_2,th_f,mu)
 
 
 %% PLOT transf veloce
-r1 = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
-r2 = kep2car(ai,ei,i_f,OM_f,om2,th2,mu);
-r3 = kep2car(af,ef,i_f,OM_f,om_f,th3,mu);
-r_tot = [r1 r2 r3];
-h = plot3(nan,nan,nan,'LineWidth',2,'Marker','o','MarkerSize',10,'Color','black','MarkerFaceColor','black');
-hold on;
-grid on;
-traj = plot3(nan,nan,nan,'LineWidth',2);
-plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--')
+[r1,v1] = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
+[r2,v2] = kep2car(ai,ei,i_f,OM_f,om2,th2,mu);
+[r3,v3] = kep2car(af,ef,i_f,OM_f,om_f,th3,mu);
 
-Terra3d;
-circular_plane(max(max(abs(r_tot(1:2,:))))*1.5,0);
-
-for i = 1 : size(r1,2)
-    plot3(r1(1,1:i),r1(2,1:i),r1(3,1:i),'LineWidth',2,'Color',"#D95319");
-    set(h,'XData',r1(1,i),'YData',r1(2,i),'ZData',r1(3,i));
-    drawnow
-    pause(.0001)
-end
-for i = 1 : size(r2,2)
-    plot3(r2(1,1:i),r2(2,1:i),r2(3,1:i),'LineWidth',2,'Color',"#0072BD");
-    set(h,'XData',r2(1,i),'YData',r2(2,i),'ZData',r2(3,i));
-    drawnow
-    pause(.0001)
-end
-for i = 1 : size(r3,2)
-    plot3(r3(1,1:i),r3(2,1:i),r3(3,1:i),'LineWidth',2,'Color',"#D95319");
-    set(h,'XData',r3(1,i),'YData',r3(2,i),'ZData',r3(3,i));
-    drawnow
-    pause(.0001)
-end
+r_tot = struct('r1',r1,'r2',r2,'r3',r3);
+v_tot = struct('v1',v1,'v2',v2,'v3',v3);
+col = ["#0072BD","#77AC30","#D95319"];
+leg = ["Waiting change of plane","Waiting secant maneuver","Approach final point"];
+view_vec = [280,-5];
+plot_orbit(r_tot,v_tot,col,leg,view_vec,'exp');

@@ -10,14 +10,25 @@
 %   leg: vector of strings that contains the legend for every single
 %   trajectory
 %
+%                               EXAMPLE
+%   [r1,v1] = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
+%   [rt1,v2] = kep2car(at,et,i_i,OM_i,om_i,tht,mu);
+%   [r2,v3] = kep2car(af,ef,i_i,OM_i,om_i,th2,mu);
+%   [r3,v4] = kep2car(af,ef,i_f,OM_f,om2,th3,mu);
+%   [r4,v5] = kep2car(af,ef,i_f,OM_f,om_f,th4,mu);
+%   r_tot = struct('r1',r1,'r2',rt1,'r3',r2,'r4',r3,'r5',r4);
+%   v_tot = struct('v1',v1,'v2',v2,'v3',v3,'v4',v4,'v5',v5);
+%   col = ["#D95319","#77AC30","#0072BD","#D95319","#0072BD"];
+%   leg = ["trasf 1","trasf 2","trasf 3","trasf 4","trasf 5"];
+%   plot_orbit(r_tot,col,leg,v_tot)
+%
 %                               ATTENTION!
 % This function needs the vectorial version of "kep2car.m",
 % "circular_plane.m", "8k_earth_daymap-2.jpg", "Earth3d". You can download
-% them from the terminal by using these lines:
-%
-% >> cd "path of your folder"\
-% >> 
-function plot_orbit(r,v,col,leg)
+% them from: https://github.com/NuzzoFrancesco02/Prova-IAMS/tree/main/Plot
+
+
+function plot_orbit(r,v,col,leg,view_vec,str)
     n = length(fieldnames(r)); r_tot = [];
     if ~isstruct(r)
         error('r_tot is not a struct');
@@ -33,22 +44,29 @@ function plot_orbit(r,v,col,leg)
     end
     hold on;
     grid on;
-    vel = quiver3(nan,nan,nan,nan,nan,nan,'Color','red','LineWidth',1.6,'MaxHeadSize',10);
-    plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--','Color','b')
+    vel = quiver3(nan,nan,nan,nan,nan,nan,'Color','red','LineWidth',1.6,'MaxHeadSize',500);
+    plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--','Color','none')
     Earth3d;
-    circular_plane(max(max(abs(r_tot(1:2,:))))*1.5,0);
+    set(gcf, 'color', 'white');
+    max_r = max(max(abs(r_tot(1:2,:))))*1.1;
+    circular_plane(max_r,0);
+    view(view_vec(1),view_vec(2))
+    box off
+    axis([-max_r max_r -max_r max_r min(r_tot(3,:))*1.2 max(r_tot(3,:))*1.2])
+    %axis([min(r_tot(1,:)) max(r_tot(1,:)) min(r_tot(2,:)) max(r_tot(2,:)) min(r_tot(3,:)) max(r_tot(3,:))])
     legend('','','')
+    F = [];
     for j = 1:n
         l = size(r.("r"+num2str(j)),2);
         curve = animatedline('LineWidth',2,'Color',col(j));
         for i = 1:l
             addpoints(curve,r.("r"+num2str(j))(1,i),r.("r"+num2str(j))(2,i),r.("r"+num2str(j))(3,i));
-            h = scatter3(r.("r"+num2str(j))(1,i),r.("r"+num2str(j))(2,i),r.("r"+num2str(j))(3,i),'filled','Color','[0.25, 0.25, 0.25]','MarkerFaceColor','[0.25, 0.25, 0.25]');
-            drawnow
-            delete(h)
+            h = scatter3(r.("r"+num2str(j))(1,i),r.("r"+num2str(j))(2,i),r.("r"+num2str(j))(3,i),150,'filled','Color','[0.25, 0.25, 0.25]','MarkerFaceColor','[0.25, 0.25, 0.25]',...
+                'LineWidth',2);
+            
             curve.DisplayName = leg(j);
             if i == 1
-            legend(curve, leg(j), 'AutoUpdate', 'off', 'Location', [.7 .8 .1 .1], 'FontSize', 10);    
+            legend(curve, leg(j), 'AutoUpdate', 'off', 'Location', 'northeast', 'FontSize', 20);    
             end
             set(vel,'XData',r.("r"+num2str(j))(1,i),'YData',r.("r"+num2str(j))(2,i),'ZData',r.("r"+num2str(j))(3,i),...
                 'UData',v.("v"+num2str(j))(1,i),'VData',v.("v"+num2str(j))(2,i),'WData',v.("v"+num2str(j))(3,i));
@@ -69,7 +87,14 @@ function plot_orbit(r,v,col,leg)
                 D_v(1),D_v(2),D_v(3),'Color',"#7E2F8E",'LineWidth',1.6,'MaxHeadSize',10);
                 q.DisplayName = '';
             end
-            legend
+            legend('Box','off','Location', 'northeast', 'FontSize', 20)
+            if nargin == 6
+                if ~strcmp(str(1),'exp')
+                    F = [F getframe(gcf)];
+                end
+            end
+            drawnow
+            delete(h)
         end
     end
     leg_2 = ['','','','',leg(1)];
@@ -80,13 +105,17 @@ function plot_orbit(r,v,col,leg)
             leg_2 = [leg_2 ''];
         end
     end
-    legend('off'); legend(leg_2);
-    i = 2;
-    while i <= 2*n-2
-        if mod(i,2) == 0
-            leg = [leg(1:i),"",leg(i+1:end)];
-            i = i + 1;
+    h = scatter3(r.("r"+num2str(j))(1,end),r.("r"+num2str(j))(2,end),r.("r"+num2str(j))(3,end),150,'filled','Color','[0.25, 0.25, 0.25]','MarkerFaceColor','[0.25, 0.25, 0.25]');
+    legend('off'); legend(leg_2); legend('Box','off','Location','northeast', 'FontSize', 20)
+    F = [F getframe(gcf)];
+    if nargin == 6
+        if ~strcmp(str(1),'exp')
+            video = VideoWriter('prova','MPEG-4');
+            video.Quality = 100;
+            video.FrameRate = 20;
+            open(video);
+            writeVideo(video,F);
+            close(video);
         end
-        i = i + 1;
     end
 end

@@ -72,7 +72,7 @@ D_v1 = sqrt(2*mu*(1/rai-1/(2*at)))-sqrt(2*mu*(1/rai-1/(2*ai)));
 D_v2 = sqrt(2*mu*(1/rpf-1/(2*af)))-sqrt(2*mu*(1/rpf-1/(2*at)));
 D_v_a_p = abs(D_v1)+abs(D_v2)
 D_t = timeOfFlight(ai,ei,th_i,pi,mu)+pi*(sqrt(at^3/mu));
-th1 = th_i:stepTh:pi; tht = th1(end)-2*pi:stepTh:0; 
+th1 = th_i:stepTh:2*pi; tht = th1(end)-2*pi:stepTh:pi; 
 D_v = abs(D_v_a_p);
 % Cambio all'apogeo: D_i > 0; D_OM > 0;
 D_i = i_f-i_i; D_OM = OM_f-OM_i; 
@@ -83,7 +83,7 @@ sin_ui = sin(i_f)*sin(D_OM)/sin(alpha);
 u_i = atan2(sin_ui,cos_ui);
 % Calcolo u_f
 cos_uf = (cos(i_i)-cos(alpha)*cos(i_f))/(sin(alpha)*sin(i_f));
-sin_uf = sin(i_i)*sin(D_OM)/sin(alpha); 
+sin_uf = sin(i_i)*sin(D_OM)/sin(alpha);
 u_f = atan2(sin_uf,cos_uf);
 % Calcolo parametri orbite
 th_man_1 = u_i-om_i;
@@ -92,7 +92,7 @@ om2 = u_f - th_man_2 + 2*pi;
 % Calcolo costo manovra
 p = af*(1-ef^2);
 D_v = D_v + abs(2*sqrt(mu/p)*(1+ef*cos(th_man_1))*sin(alpha/2));
-th2 = tht(end):stepTh:th_man_1;
+th2 = pi:stepTh:th_man_1;
 D_t = D_t + timeOfFlight(af,ef,0,th_man_1,mu);
 % Cambio periasse
 d_om = om_f-om2+2*pi;
@@ -106,15 +106,15 @@ D_t = D_t + timeOfFlight(af,ef,th2_m,th_f,mu);
 D_t
 D_v
 
-[r1,v1] = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu); %arrivo apogeo
-[r2,v2] = kep2car(at,et,i_i,OM_i,om_i,tht,mu); %bitangente
-[r3,v3] = kep2car(af,ef,i_i,OM_i,om_i,th2,mu); % arrivo cambio piano
+[r1,v1] = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu); %arrivo cambio piano
+[r2,v2] = kep2car(ai,ei,i_f,OM_f,om2,th2,mu); %arrivo apogeo
+[r3,v3] = kep2car(at,et,i_f,OM_f,om2,tht,mu); % bitangente
 [r4,v4] = kep2car(af,ef,i_f,OM_f,om2,th3,mu); % arrivo cambio periasse
 [r5,v5] = kep2car(af,ef,i_f,OM_f,om_f,th4,mu); %arrivo punto finale
 
 r_tot = struct('r1',r1,'r2',r2,'r3',r3,'r4',r4,'r5',r5);
 v_tot = struct('v1',v1,'v2',v2,'v3',v3,'v4',v4,'v5',v5);
 col = ["#0072BD","#77AC30","#D95319","#4DBEEE","#A2142F"];
-leg = ["Arrivo all'apogeo","Trasf. bitangente","Attesa cambio piano","Attesa cambio periasse","Arrivo punto finale"];
-view_vec = [-1.656559270276668e+02,7.017518180556356];
+leg = ["Attesa cambio piano","Attesa all'apogeo","Trasf. bitangente","Attesa cambio periasse","Arrivo punto finale"];
+view_vec = [280,-5];
 plot_orbit(r_tot,v_tot,col,leg,view_vec,'exp');
