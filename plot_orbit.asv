@@ -1,5 +1,5 @@
 %% PLOT ORBIT
-% plot_orbit(r,v,col,leg)
+% plot_orbit(r,v,col,leg,view_vec,str)
 % This function uses r and v as structures, the number of fields is the
 % number of trajectory (n)
 %                               INPUT
@@ -9,6 +9,7 @@
 %   trajectory
 %   leg: vector of strings that contains the legend for every single
 %   trajectory
+%
 %
 %                               EXAMPLE
 %   [r1,v1] = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
@@ -28,7 +29,7 @@
 % them from: https://github.com/NuzzoFrancesco02/Prova-IAMS/tree/main/Plot
 
 
-function plot_orbit(r,v,col,leg,str)
+function plot_orbit(r,v,col,leg,view_vec,str)
     n = length(fieldnames(r)); r_tot = [];
     if ~isstruct(r)
         error('r_tot is not a struct');
@@ -44,10 +45,16 @@ function plot_orbit(r,v,col,leg,str)
     end
     hold on;
     grid on;
-    vel = quiver3(nan,nan,nan,nan,nan,nan,'Color','red','LineWidth',1.6,'MaxHeadSize',10);
-    plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--','Color','b')
+    vel = quiver3(nan,nan,nan,nan,nan,nan,'Color','red','LineWidth',1.6,'MaxHeadSize',500);
+    plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--','Color','none')
     Earth3d;
-    circular_plane(max(max(abs(r_tot(1:2,:))))*1.5,0);
+    set(gcf, 'color', 'white');
+    max_r = max(max(abs(r_tot(1:2,:))))*1.1;
+    circular_plane(max_r,0);
+    view(view_vec(1),view_vec(2))
+    box off
+    axis([-max_r max_r -max_r max_r min(r_tot(3,:))*1.2 max(r_tot(3,:))*1.2])
+    %axis([min(r_tot(1,:)) max(r_tot(1,:)) min(r_tot(2,:)) max(r_tot(2,:)) min(r_tot(3,:)) max(r_tot(3,:))])
     legend('','','')
     F = [];
     for j = 1:n
@@ -55,11 +62,12 @@ function plot_orbit(r,v,col,leg,str)
         curve = animatedline('LineWidth',2,'Color',col(j));
         for i = 1:l
             addpoints(curve,r.("r"+num2str(j))(1,i),r.("r"+num2str(j))(2,i),r.("r"+num2str(j))(3,i));
-            h = scatter3(r.("r"+num2str(j))(1,i),r.("r"+num2str(j))(2,i),r.("r"+num2str(j))(3,i),'filled','Color','[0.25, 0.25, 0.25]','MarkerFaceColor','[0.25, 0.25, 0.25]');
+            h = scatter3(r.("r"+num2str(j))(1,i),r.("r"+num2str(j))(2,i),r.("r"+num2str(j))(3,i),150,'filled','Color','[0.25, 0.25, 0.25]','MarkerFaceColor','[0.25, 0.25, 0.25]',...
+                'LineWidth',2);
             
             curve.DisplayName = leg(j);
             if i == 1
-            legend(curve, leg(j), 'AutoUpdate', 'off', 'Location', [.7 .8 .1 .1], 'FontSize', 10);    
+            legend(curve, leg(j), 'AutoUpdate', 'off', 'Location', 'northeast', 'FontSize', 20);    
             end
             set(vel,'XData',r.("r"+num2str(j))(1,i),'YData',r.("r"+num2str(j))(2,i),'ZData',r.("r"+num2str(j))(3,i),...
                 'UData',v.("v"+num2str(j))(1,i),'VData',v.("v"+num2str(j))(2,i),'WData',v.("v"+num2str(j))(3,i));
@@ -80,8 +88,8 @@ function plot_orbit(r,v,col,leg,str)
                 D_v(1),D_v(2),D_v(3),'Color',"#7E2F8E",'LineWidth',1.6,'MaxHeadSize',10);
                 q.DisplayName = '';
             end
-            legend('Box','off','Location', [.7 .8 .1 .1], 'FontSize', 10)
-            if nargin == 5
+            legend('Box','off','Location', 'northeast', 'FontSize', 20)
+            if nargin == 6
                 if ~strcmp(str(1),'exp')
                     F = [F getframe(gcf)];
                 end
@@ -98,11 +106,14 @@ function plot_orbit(r,v,col,leg,str)
             leg_2 = [leg_2 ''];
         end
     end
-    legend('off'); legend(leg_2); legend('Box','off','Location', [.7 .8 .1 .1], 'FontSize', 10)
+    h = scatter3(r.("r"+num2str(j))(1,end),r.("r"+num2str(j))(2,end),r.("r"+num2str(j))(3,end),150,'filled','Color','[0.25, 0.25, 0.25]','MarkerFaceColor','[0.25, 0.25, 0.25]');
+    legend('off'); legend(leg_2); legend('Box','off','Location','northeast', 'FontSize', 20)
     F = [F getframe(gcf)];
-    if nargin == 5
+    if nargin == 6
         if ~strcmp(str(1),'exp')
             video = VideoWriter('prova','MPEG-4');
+            video.Quality = 100;
+            video.FrameRate = 20;
             open(video);
             writeVideo(video,F);
             close(video);

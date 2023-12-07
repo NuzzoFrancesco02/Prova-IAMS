@@ -56,4 +56,4 @@ v_tot = struct('v1',v1,'v2',v2,'v3',v3);
 col = ["#0072BD","#77AC30","#D95319"];
 leg = ["Waiting change of plane","Waiting secant maneuver","Approach final point"];
 view_vec = [280,-5];
-plot_orbit(r_tot,v_tot,col,leg,view_vec,'exp');
+plot_orbit(r_tot,v_tot,col,leg,view_vec);

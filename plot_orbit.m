@@ -1,7 +1,7 @@
 %% PLOT ORBIT
-% plot_orbit(r,v,col,leg)
-% This function uses r and v as structures, the number of fields is the
-% number of trajectory (n)
+% plot_orbit(r,v,col,leg,view_vec,str)
+%   This function uses r and v as structures, the number of fields is the
+%   number of trajectories (n)
 %                               INPUT
 %   r: struct that contains the trajectory in cartesian coordinates 
 %   v: struct that contains the velocity in cartesian coordinates
@@ -9,6 +9,8 @@
 %   trajectory
 %   leg: vector of strings that contains the legend for every single
 %   trajectory
+%   view_vec : vector of view of the plot
+%   str : 'exp' to export as a .mp4 video
 %
 %                               EXAMPLE
 %   [r1,v1] = kep2car(ai,ei,i_i,OM_i,om_i,th1,mu);
@@ -19,13 +21,14 @@
 %   r_tot = struct('r1',r1,'r2',rt1,'r3',r2,'r4',r3,'r5',r4);
 %   v_tot = struct('v1',v1,'v2',v2,'v3',v3,'v4',v4,'v5',v5);
 %   col = ["#D95319","#77AC30","#0072BD","#D95319","#0072BD"];
-%   leg = ["trasf 1","trasf 2","trasf 3","trasf 4","trasf 5"];
+%   leg = ["transf 1","transf 2","transf 3","transf 4","transf 5"];
 %   plot_orbit(r_tot,col,leg,v_tot)
 %
 %                               ATTENTION!
 % This function needs the vectorial version of "kep2car.m",
 % "circular_plane.m", "8k_earth_daymap-2.jpg", "Earth3d". You can download
-% them from: https://github.com/NuzzoFrancesco02/Prova-IAMS/tree/main/Plot
+% them from: https://github.com/NuzzoFrancesco02/Prova-IAMS/tree/main/Plot.
+% The fields must be called 'r1','r2',...,'rn'; the same with velocities
 
 
 function plot_orbit(r,v,col,leg,view_vec,str)
@@ -45,7 +48,14 @@ function plot_orbit(r,v,col,leg,view_vec,str)
     hold on;
     grid on;
     vel = quiver3(nan,nan,nan,nan,nan,nan,'Color','red','LineWidth',1.6,'MaxHeadSize',500);
-    plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--','Color','none')
+    if nargin == 6 && ~strcmp(str(1),'exp')
+        col_traj = 'none';
+        leg_pos = [.7 .8 .1 .1];
+    else 
+        col_traj = 'k';
+        leg_pos = 'northeast';
+    end
+    plot3(r_tot(1,:),r_tot(2,:),r_tot(3,:),'LineWidth',0.1,'LineStyle','--','Color',col_traj)
     Earth3d;
     set(gcf, 'color', 'white');
     max_r = max(max(abs(r_tot(1:2,:))))*1.1;
@@ -66,7 +76,7 @@ function plot_orbit(r,v,col,leg,view_vec,str)
             
             curve.DisplayName = leg(j);
             if i == 1
-            legend(curve, leg(j), 'AutoUpdate', 'off', 'Location', 'northeast', 'FontSize', 20);    
+            legend(curve, leg(j), 'AutoUpdate', 'off', 'Location', leg_pos, 'FontSize', 20);    
             end
             set(vel,'XData',r.("r"+num2str(j))(1,i),'YData',r.("r"+num2str(j))(2,i),'ZData',r.("r"+num2str(j))(3,i),...
                 'UData',v.("v"+num2str(j))(1,i),'VData',v.("v"+num2str(j))(2,i),'WData',v.("v"+num2str(j))(3,i));
@@ -87,7 +97,7 @@ function plot_orbit(r,v,col,leg,view_vec,str)
                 D_v(1),D_v(2),D_v(3),'Color',"#7E2F8E",'LineWidth',1.6,'MaxHeadSize',10);
                 q.DisplayName = '';
             end
-            legend('Box','off','Location', 'northeast', 'FontSize', 20)
+            legend('Box','off','Location', leg_pos, 'FontSize', 20)
             if nargin == 6
                 if ~strcmp(str(1),'exp')
                     F = [F getframe(gcf)];
@@ -106,7 +116,7 @@ function plot_orbit(r,v,col,leg,view_vec,str)
         end
     end
     h = scatter3(r.("r"+num2str(j))(1,end),r.("r"+num2str(j))(2,end),r.("r"+num2str(j))(3,end),150,'filled','Color','[0.25, 0.25, 0.25]','MarkerFaceColor','[0.25, 0.25, 0.25]');
-    legend('off'); legend(leg_2); legend('Box','off','Location','northeast', 'FontSize', 20)
+    legend('off'); legend(leg_2); legend('Box','off','Location',leg_pos, 'FontSize', 20)
     F = [F getframe(gcf)];
     if nargin == 6
         if ~strcmp(str(1),'exp')

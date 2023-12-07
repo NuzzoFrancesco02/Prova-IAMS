@@ -67,4 +67,4 @@ v_tot = struct('v1',v1,'v2',v2,'v3',v3,'v4',v4,'v5',v5);
 col = ["#0072BD","#77AC30","#D95319","#4DBEEE","#A2142F"];
 leg = ["Approach to apocenter","Bitangent transfer","Waiting change of plane","Waiting change of periapsis","Approach final point"];
 view_vec = [260,-5];
-plot_orbit(r_tot,v_tot,col,leg,view_vec,'exp');
+plot_orbit(r_tot,v_tot,col,leg,view_vec);
